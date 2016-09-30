@@ -64,7 +64,7 @@ var adapter = {
   applyMigration: function(migration, cb) {
     var self = this;
     var sql = util.getSql(migration);
-    var sqlQueries = sql.split(';');
+    var sqlQueries = sql.split(/;\n/g);
 
     console.log('Applying ' + migration);
     console.log('===============================================');
