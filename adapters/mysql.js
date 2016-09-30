@@ -44,6 +44,7 @@ var adapter = {
     }
     if (!_connection) return _panic('Connection not open.  You need to call open() before running any queries.');
 
+    console.log(query);
     _connection.query(query, values, function(err, result) {
       // We don't want to error on empty query error.
       if (err && err.code !== 'ER_EMPTY_QUERY') _panic(err);
@@ -62,26 +63,32 @@ var adapter = {
   },
 
   applyMigration: function(migration, cb) {
+    var self = this;
     var sql = util.getSql(migration);
+    var sqlQueries = sql.split(';');
 
-    this.exec(sql, function(result) {
-      console.log('Applying ' + migration);
-      console.log('===============================================');
+    console.log('Applying ' + migration);
+    console.log('===============================================');
 
-      var values = [migration.match(/^(\d)+/)[0]];
-      this.exec('insert into __migrations__ (id) values (?)', values, cb);
-    }.bind(this));
+    function applyMigrationPart() {
+      if (!sqlQueries.length) {
+        var values = [migration.match(/^(\d)+/)[0]];
+        return self.exec('insert into __migrations__ (id) values (?)', values, cb);
+      }
+
+      self.exec(sqlQueries.shift(), applyMigrationPart);
+    }
+
+    applyMigrationPart();
   },
 
   clearDatabase: function(cb) {
-    var self = this;
-
-    self.exec('drop database if exists sumome', function() {
-      self.exec('create database if not exists sumome', function() {
+    this.exec('drop database if exists sumome', function() {
+      this.exec('create database if not exists sumome', function() {
         // Reconnect to sumome db now that it is recreated.
         _connection.changeUser({ database: 'sumome' }, cb);
       });
-    });
+    }.bind(this));
   },
 
   ensureMigrationTableExists: function(cb) {
