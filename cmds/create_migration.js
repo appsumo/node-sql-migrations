@@ -2,6 +2,7 @@ var fs = require('fs');
 var mkdirp = require('mkdirp');
 var path = require('path');
 var prompt = require('prompt');
+var chalk = require('chalk');
 var config = require('../config.js');
 var util = require('../util.js');
 
@@ -42,6 +43,14 @@ function createMigration(done) {
 
     fs.openSync(up, 'w');
     //fs.openSync(down, 'w');
+
+    // New line
+    console.log('');
+    console.log([
+      chalk.yellow('>>') + ' Migration files are designed to be immutable.',
+      chalk.yellow('>>') + ' After committing a migration, it should not be changed.',
+      chalk.yellow('>>') + ' Instead, you should create a new migration to alter the current state of the database.'
+    ].join('\n'));
 
     done();
   });
