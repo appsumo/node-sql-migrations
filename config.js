@@ -1,12 +1,5 @@
-/**
- * Mutable container for configuration
- *
- * // file1.js
- * var cfg = require('./config.js');
- * cfg.a = 5;
- *
- * // file2.js
- * var a = require('./config.js ').a;
- *
- */
-module.exports = {};
+// Used to globally store config.
+module.exports = {
+  migrationsDir: './fixtures/migrations',
+  host: 'localhost',
+};
