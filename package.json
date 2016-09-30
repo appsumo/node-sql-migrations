@@ -1,5 +1,5 @@
 {
-  "name": "sql-migrations",
+  "name": "node-sql-migrations",
   "version": "0.1.0",
   "description": "raw SQL migrations library for Node.js",
   "main": "index.js",
