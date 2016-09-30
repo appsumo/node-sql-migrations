@@ -38,7 +38,7 @@ function createMigration(done) {
     up = path.resolve(config.migrationsDir, up);
     //down = path.resolve(cfg.migrationsDir, down);
 
-    console.log(up);
+    console.log(chalk.green('>>') + ' ' + up);
     //console.log(down);
 
     fs.openSync(up, 'w');
