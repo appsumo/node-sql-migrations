@@ -44,8 +44,7 @@ var adapter = {
     }
     if (!_connection) return _panic('Connection not open.  You need to call open() before running any queries.');
 
-    console.log('++++++++++++++++++++++');
-    console.log(query);
+    console.log(query)
     _connection.query(query, values, function(err, result) {
       // We don't want to error on empty query error.
       if (err && err.code !== 'ER_EMPTY_QUERY') _panic(err);
