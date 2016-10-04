@@ -19,4 +19,5 @@ module.exports = {
   createMigration: configWrapper(require('./cmds/create_migration.js')),
   migrate: configWrapper(require('./cmds/migrate.js')),
   rebuild: configWrapper(require('./cmds/rebuild.js')),
+  seed: configWrapper(require('./cmds/seed.js')),
 };

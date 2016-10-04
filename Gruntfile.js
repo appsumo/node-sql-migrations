@@ -22,4 +22,9 @@ module.exports = function(grunt) {
     var done = this.async();
     migrator.rebuild(dbConfig, done);
   });
+
+  grunt.registerTask('db:seed', function() {
+    var done = this.async();
+    migrator.seed(dbConfig, done);
+  });
 };

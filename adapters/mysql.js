@@ -20,6 +20,11 @@ function _getConnection() {
   return _connection;
 }
 
+function _splitIntoQueries(sql) {
+  if (!sql) return [];
+  return sql.split(/;\n/g);
+}
+
 function _panic(err) {
   adapter.close();
   util.panic(err);
@@ -52,6 +57,23 @@ var adapter = {
     });
   },
 
+  // This is to split up sql files into individual commands.  It doesn't take
+  // values because there isn't a specified query to give them to.
+  batchExec: function(batchSql, cb) {
+    var self = this;
+    var sqlQueries = _splitIntoQueries(batchSql);
+
+    function applyPart() {
+      if (!sqlQueries.length) {
+        return cb();
+      }
+
+      self.exec(sqlQueries.shift(), applyPart);
+    }
+
+    applyPart();
+  },
+
   appliedMigrations: function(cb) {
     this.ensureMigrationTableExists(function(err) {
       this.exec('select * from __migrations__', function(result) {
@@ -65,21 +87,20 @@ var adapter = {
   applyMigration: function(migration, cb) {
     var self = this;
     var sql = util.getSql(migration);
-    var sqlQueries = sql.split(/;\n/g);
 
     console.log('Applying ' + migration);
     console.log('===============================================');
 
-    function applyMigrationPart() {
-      if (!sqlQueries.length) {
-        var values = [migration.match(/^(\d)+/)[0]];
-        return self.exec('insert into __migrations__ (id) values (?)', values, cb);
-      }
+    this.batchExec(sql, function() {
+      var values = [migration.match(/^(\d)+/)[0]];
+      return self.exec('insert into __migrations__ (id) values (?)', values, cb);
+    });
+  },
 
-      self.exec(sqlQueries.shift(), applyMigrationPart);
-    }
-
-    applyMigrationPart();
+  // Takes a seed environment to run in fixture/seeds/. e.g. 'default'
+  applySeed: function(seed, callback) {
+    var sql = util.getSeedSql(seed);
+    this.batchExec(sql, callback);
   },
 
   clearDatabase: function(cb) {

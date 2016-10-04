@@ -33,5 +33,12 @@ module.exports = {
   getSql: function(migration) {
     var migrationPath = path.join(config.migrationsDir, migration);
     return fs.readFileSync(migrationPath).toString();
+  },
+
+  getSeedSql: function(seed) {
+    // default.sql is temporary and will more than likely add many seed files
+    // in the future.
+    var seedPath = path.join(config.seedDir, seed + '.sql');
+    return fs.readFileSync(seedPath).toString();
   }
 };
